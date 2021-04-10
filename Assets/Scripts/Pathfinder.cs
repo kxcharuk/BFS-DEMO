@@ -25,6 +25,12 @@ public class Pathfinder : MonoBehaviour
         Vector2Int.left
     };
 
+    private void Awake()
+    {
+        startWaypoint.isStartWaypoint = true;
+        endWaypoint.isEndWaypoint = true;
+    }
+
     public List<Waypoint> GetPath()
     {
         if(path.Count == 0)
