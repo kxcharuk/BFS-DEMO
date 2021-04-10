@@ -6,11 +6,11 @@ public class Waypoint : MonoBehaviour
 {
     WaypointManager waypointManager;
     
-    [HideInInspector] public bool isExplored = false;
+    /*[HideInInspector]*/ public bool isExplored = false;
     [SerializeField] public bool isObstacle = false; // not a path tile or a placeable tile
 
-    [HideInInspector] public bool isStartWaypoint = false;
-    [HideInInspector] public bool isEndWaypoint = false;
+    /*[HideInInspector]*/ public bool isStartWaypoint = false;
+    /*[HideInInspector]*/ public bool isEndWaypoint = false;
 
     /*[HideInInspector] public bool isSelected = false;
     [HideInInspector] public bool canSelect = true;*/
@@ -29,14 +29,14 @@ public class Waypoint : MonoBehaviour
 
     private void Update()
     {
-        if (isStartWaypoint)
+        /*if (isStartWaypoint)
         {
             meshRenderer.material.color = Color.green;
         }
         else if (isEndWaypoint)
         {
             meshRenderer.material.color = Color.red;
-        }
+        }*/
     }
 
     public Vector2Int GetGridPos()
@@ -74,10 +74,6 @@ public class Waypoint : MonoBehaviour
             }
             else
             {
-                //Vector3 newPos = new Vector3();
-                //newPos = waypointManager.waypoints.Dequeue().transform.position;
-                //this.transform.position = newPos;
-                //waypointManager.lastQueuedWaypointPos = this.transform.position;
                 waypointManager.waypoints.Dequeue().transform.position = this.transform.position;
                 this.transform.position = waypointManager.lastQueuedWaypointPos;
                 
@@ -85,6 +81,8 @@ public class Waypoint : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(1))
         {
+            if(isEndWaypoint || isStartWaypoint) { return; }
+
             if (isObstacle)
             {
                 meshRenderer.material.color = Color.gray;

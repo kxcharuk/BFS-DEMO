@@ -33,7 +33,7 @@ public class CoordLabeler : MonoBehaviour
         coords.x = Mathf.RoundToInt(this.transform.position.x);
         coords.y = Mathf.RoundToInt(this.transform.position.z);
 
-        //gameObject.name = coords.x.ToString() + "," + coords.y.ToString();
+        gameObject.name = coords.x.ToString() + "," + coords.y.ToString();
         label.text = (coords.x.ToString() + "," + coords.y.ToString());
     }
 }

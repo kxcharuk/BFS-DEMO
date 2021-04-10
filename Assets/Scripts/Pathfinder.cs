@@ -16,6 +16,7 @@ public class Pathfinder : MonoBehaviour
 
     private bool pathFound = false;
 
+    Waypoint[] wayp;
 
     Vector2Int[] directions =
     {
@@ -31,8 +32,9 @@ public class Pathfinder : MonoBehaviour
         endWaypoint.isEndWaypoint = true;
     }
 
-    public List<Waypoint> GetPath()
+    public /*List<Waypoint>*/void GetPath()
     {
+        ResetPathfinder();
         if(path.Count == 0)
         {
             AddWaypointsToDictionary();
@@ -40,7 +42,37 @@ public class Pathfinder : MonoBehaviour
             CreatePath();
         }
         ChangeColorOfTilesInPath();
-        return path;
+        //return path;
+    }
+
+    private void ResetPathfinder()
+    {
+        wayp = FindObjectsOfType<Waypoint>();
+        ResetTileColors();
+        path.Clear();
+        grid.Clear();
+        queue.Clear();
+        searchCenter = null;
+        foreach(Waypoint way in wayp)
+        {
+            way.isExplored = false;
+        }
+        pathFound = false;
+    }
+
+    private void ResetTileColors()
+    {
+        foreach (Waypoint way in wayp)
+        {
+            if (way.isStartWaypoint || way.isEndWaypoint || way.isObstacle)
+            {
+
+            }
+            else
+            {
+                way.GetComponentInChildren<MeshRenderer>().material.color = Color.gray;
+            }
+        }
     }
 
     private void AddWaypointsToDictionary()
@@ -70,6 +102,7 @@ public class Pathfinder : MonoBehaviour
             {
                 searchCenter = queue.Dequeue();
                 SearchNeighbors();
+                //StartCoroutine(Search());
                 searchCenter.isExplored = true;
             }
         }
@@ -96,9 +129,50 @@ public class Pathfinder : MonoBehaviour
         }
         else
         {
+            if(neighbor.isEndWaypoint || neighbor.isStartWaypoint) { }
+            else
+            {
+                neighbor.GetComponentInChildren<MeshRenderer>().material.color = Color.cyan;
+            }
             queue.Enqueue(neighbor);
             neighbor.searchedFrom = searchCenter; 
         }
+    }
+
+    IEnumerator Search()
+    {
+        foreach (Vector2Int direction in directions)
+        {
+            Vector2Int searchCoords = searchCenter.GetGridPos() + direction;
+            if (grid.ContainsKey(searchCoords))
+            {
+                //QueueNeighbors(searchCoords);
+                StartCoroutine(Queue(searchCoords));
+                
+            }
+            yield return new WaitForSeconds(4);
+        }
+    }
+
+    IEnumerator Queue(Vector2Int searchCoords)
+    {
+        Waypoint neighbor = grid[searchCoords];
+        if (neighbor.isExplored || queue.Contains(neighbor))
+        {
+            //yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.1f);
+        }
+        else
+        {
+            if (neighbor.isEndWaypoint || neighbor.isStartWaypoint) { }
+            else
+            {
+                neighbor.GetComponentInChildren<MeshRenderer>().material.color = Color.cyan;
+            }
+            queue.Enqueue(neighbor);
+            neighbor.searchedFrom = searchCenter;
+        }
+        yield return new WaitForSeconds(0.1f);
     }
 
     // ------------------------------------------------------------------------------------ Creating the path
@@ -127,9 +201,14 @@ public class Pathfinder : MonoBehaviour
     {
         foreach (Waypoint waypoint in path)
         {
-            waypoint.GetComponentInChildren<MeshRenderer>().material.color = Color.magenta;
+            if(waypoint.isStartWaypoint || waypoint.isEndWaypoint)
+            {
+
+            }
+            else
+            {
+                waypoint.GetComponentInChildren<MeshRenderer>().material.color = Color.magenta;
+            }
         }
-        startWaypoint.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
-        endWaypoint.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
     }
 }
